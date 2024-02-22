@@ -1,0 +1,41 @@
+version: '3.4'
+
+networks:
+  emp_rabbit_net:
+    driver: bridge
+
+volumes:
+  rabbitmqdata:
+
+services:
+  userdetails.api:
+    image: ${DOCKER_REGISTRY-}userdetailsapi
+    build:
+      context: .
+      dockerfile: UserDetails.Api/Dockerfile
+    ports:
+      - 8001:80
+    depends_on:
+      - rabbitmq
+    networks:
+      - emp_rabbit_net
+
+  usertask.api:
+    image: ${DOCKER_REGISTRY-}usertaskapi
+    build:
+      context: .
+      dockerfile: UserTask.Api/Dockerfile
+    ports:
+      - 8002:80
+    depends_on:
+      - rabbitmq
+    networks:
+      - emp_rabbit_net
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - emp_rabbit_net
